@@ -2,16 +2,40 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 public class NetworkingDemo {
 
 	private static int port=33333;
 	
 	public static void main(String[] args) throws Exception{
-		System.out.println("The chat server is running.");
         ServerSocket listener = new ServerSocket(port);
+        //System.out.println("The server is running (inet) : "+listener.getInetAddress());
+        //System.out.println("The server is running (local): "+listener.getLocalSocketAddress());
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            for(NetworkInterface ni : Collections.list(interfaces)){
+                for(InetAddress address : Collections.list(ni.getInetAddresses()))
+                {
+                    if(address instanceof Inet4Address){
+                    	System.out.println("ipv4: "+address);
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        
+        
         try {
             while (true) {
                 new NetworkingDemoThread(listener.accept()).start();
